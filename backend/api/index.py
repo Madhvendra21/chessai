@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from mangum import Mangum
 import uuid
 from datetime import datetime
 
@@ -57,3 +58,6 @@ def get_job(job_id: str):
 @app.get("/api/jobs")
 def list_jobs():
     return list(jobs.values())
+
+# Serverless handler for Vercel
+handler = Mangum(app)

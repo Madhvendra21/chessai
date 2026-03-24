@@ -16,4 +16,12 @@ from backend.api.index import app
 # Vercel handler using Mangum
 from mangum import Mangum
 
-handler = Mangum(app, lifespan="off")
+# Create the Mangum handler
+mangum_handler = Mangum(app, lifespan="off")
+
+# Vercel requires a handler function
+def handler(request, context=None):
+    """
+    Vercel serverless function handler
+    """
+    return mangum_handler(request, context)
