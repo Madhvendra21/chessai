@@ -5,10 +5,17 @@
     "enabled": true
   },
   "framework": null,
-  "routes": [
+  "buildCommand": null,
+  "devCommand": null,
+  "installCommand": null,
+  "outputDirectory": ".",
+  "builds": [
     {
-      "handle": "filesystem"
-    },
+      "src": "api/index.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
     {
       "src": "/api/(.*)",
       "dest": "/api/index.py"
