@@ -5,3 +5,4 @@ python-chess==1.999
 numpy==1.26.3
 pillow==10.2.0
 pydantic==2.5.3
+mangum==0.17.0
