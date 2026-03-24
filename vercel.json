@@ -1,15 +1,4 @@
 {
   "version": 2,
-  "public": true,
-  "outputDirectory": "dist",
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ]
+  "public": true
 }
