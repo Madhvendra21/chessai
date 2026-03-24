@@ -1,0 +1,8 @@
+frontend/
+backend/
+cv-pipeline/
+workers/
+scripts/
+docker/
+data/
+docs/
