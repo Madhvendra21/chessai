@@ -224,7 +224,7 @@
                     if (response.ok) {
                         const job = await response.json();
                         if (job.status === 'completed') {
-                            window.location.href = `/game.html?id=${jobId}`;
+                            window.location.href = `/game.html?id=${job.game_id}`;
                         }
                     }
                 } catch (e) {}

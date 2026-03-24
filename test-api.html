@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #1a1a2e; color: white; }
+        .result { background: rgba(255,255,255,0.1); padding: 10px; margin: 10px 0; border-radius: 5px; }
+        button { padding: 10px 20px; background: #7ee8fa; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>ChessVision AI - API Test</h1>
+    <button onclick="testAPI()">Test API Connection</button>
+    <div id="results"></div>
+    
+    <script>
+        const API_URL = 'http://localhost:8000/api';
+        
+        async function testAPI() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<div class="result">Testing...</div>';
+            
+            try {
+                // Test 1: Health check
+                const health = await fetch(`${API_URL}/`);
+                const healthData = await health.json();
+                results.innerHTML += `<div class="result">✅ API Health: ${JSON.stringify(healthData)}</div>`;
+                
+                // Test 2: Create job
+                const create = await fetch(`${API_URL}/jobs/from-url`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        url: 'https://www.youtube.com/watch?v=AEW6HbxbbNQ',
+                        title: 'Test Video'
+                    })
+                });
+                const jobData = await create.json();
+                results.innerHTML += `<div class="result">✅ Job Created: ${jobData.id}</div>`;
+                
+                // Test 3: List jobs
+                const list = await fetch(`${API_URL}/jobs/`);
+                const jobsData = await list.json();
+                results.innerHTML += `<div class="result">✅ Jobs Count: ${jobsData.length}</div>`;
+                
+                results.innerHTML += `<div class="result" style="background: #28a745;">🎉 All tests passed! API is working.</div>`;
+                
+            } catch (error) {
+                results.innerHTML += `<div class="result" style="background: #dc3545;">❌ Error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

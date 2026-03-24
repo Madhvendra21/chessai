@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug - ChessVision AI</title>
+    <style>
+        body { 
+            background: #1a1a2e; 
+            color: #fff; 
+            font-family: Arial; 
+            padding: 20px;
+            font-size: 14px;
+        }
+        .log { 
+            background: rgba(255,255,255,0.1); 
+            padding: 10px; 
+            margin: 5px 0; 
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .error { background: rgba(255,0,0,0.3); }
+        .success { background: rgba(0,255,0,0.2); }
+        button {
+            padding: 10px 20px;
+            background: #7ee8fa;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 ChessVision AI Debugger</h1>
+    <div id="logs"></div>
+    
+    <script>
+        const API_URL = 'http://localhost:8000/api';
+        const logs = document.getElementById('logs');
+        
+        function log(msg, type='info') {
+            const div = document.createElement('div');
+            div.className = 'log ' + type;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            logs.appendChild(div);
+        }
+        
+        async function testAPI() {
+            log('Testing API connection...');
+            
+            try {
+                // Test 1: Health check
+                const health = await fetch(`${API_URL}/`);
+                const healthData = await health.json();
+                log('✅ API Health: ' + JSON.stringify(healthData), 'success');
+                
+                // Test 2: Get jobs
+                const jobsRes = await fetch(`${API_URL}/jobs/`);
+                const jobs = await jobsRes.json();
+                log(`✅ Found ${jobs.length} jobs`, 'success');
+                
+                if (jobs.length > 0) {
+                    const job = jobs[0];
+                    log(`Job: ${job.title} (Status: ${job.status})`);
+                    
+                    if (job.game_id) {
+                        log(`Game ID: ${job.game_id}`);
+                        
+                        // Test 3: Get game
+                        const gameRes = await fetch(`${API_URL}/games/${job.game_id}`);
+                        const game = await gameRes.json();
+                        
+                        if (game.error) {
+                            log('❌ Game error: ' + game.error, 'error');
+                        } else {
+                            log(`✅ Game loaded: ${game.moves?.length || 0} moves`, 'success');
+                            log(`First move: ${game.moves?.[0]?.san || 'N/A'}`);
+                            log(`Last move: ${game.moves?.[game.moves.length-1]?.san || 'N/A'}`);
+                        }
+                    } else {
+                        log('⚠️ No game ID for this job', 'error');
+                    }
+                }
+                
+            } catch (err) {
+                log('❌ Error: ' + err.message, 'error');
+            }
+        }
+        
+        async function createTestJob() {
+            log('Creating test job...');
+            
+            try {
+                const res = await fetch(`${API_URL}/jobs/from-url`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        url: 'https://youtube.com/watch?v=test123',
+                        title: 'Debug Test'
+                    })
+                });
+                
+                const data = await res.json();
+                log('✅ Job created: ' + data.id, 'success');
+                log('Waiting 8 seconds for processing...');
+                
+                setTimeout(async () => {
+                    log('Checking job status...');
+                    const jobRes = await fetch(`${API_URL}/jobs/${data.id}`);
+                    const job = await jobRes.json();
+                    log(`Job status: ${job.status} (Game: ${job.game_id || 'None'})`);
+                    
+                    if (job.game_id) {
+                        const gameRes = await fetch(`${API_URL}/games/${job.game_id}`);
+                        const game = await gameRes.json();
+                        log(`✅ Game ready with ${game.moves?.length || 0} moves!`, 'success');
+                    }
+                }, 8000);
+                
+            } catch (err) {
+                log('❌ Error: ' + err.message, 'error');
+            }
+        }
+        
+        async function directGameTest() {
+            log('Testing with known game ID...');
+            
+            // Use a known game ID
+            const gameId = 'a1326534-3a21-4bd4-a33f-59ab7ba7dcef';
+            
+            try {
+                const res = await fetch(`${API_URL}/games/${gameId}`);
+                const game = await res.json();
+                
+                if (game.error) {
+                    log('❌ ' + game.error, 'error');
+                } else {
+                    log(`✅ Game found: ${game.moves?.length} moves`, 'success');
+                    log(`White: ${game.white_player}`);
+                    log(`Black: ${game.black_player}`);
+                    log(`Result: ${game.result}`);
+                }
+            } catch (err) {
+                log('❌ Error: ' + err.message, 'error');
+            }
+        }
+        
+        // Run initial test
+        log('Page loaded. Click buttons to test.');
+        log('API URL: ' + API_URL);
+    </script>
+    
+    <button onclick="testAPI()">Test Existing Jobs</button>
+    <button onclick="createTestJob()">Create New Job</button>
+    <button onclick="directGameTest()">Test Known Game ID</button>
+    <br><br>
+    <a href="http://localhost:8080" style="color: #7ee8fa;">← Back to Main Site</a>
+</body>
+</html>
