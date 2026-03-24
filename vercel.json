@@ -1,19 +1,20 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "public/**/*",
-      "use": "@vercel/static"
-    }
-  ],
+  "public": true,
+  "github": {
+    "enabled": false
+  },
   "routes": [
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/api/(.*)",
-      "dest": "https://chessvision-api.vercel.app/api/$1"
+      "dest": "/api/index.py"
     },
     {
       "src": "/(.*)",
-      "dest": "/public/$1"
+      "dest": "/$1"
     }
   ]
 }

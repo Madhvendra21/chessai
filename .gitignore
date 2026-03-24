@@ -69,3 +69,7 @@ htmlcov/
 # Celery
 celerybeat-schedule
 celerybeat.pid
+
+# Vercel
+.vercel
+*.tsbuildinfo
