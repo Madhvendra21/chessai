@@ -8,6 +8,6 @@
     "preview": "cd frontend && npm run preview"
   },
   "engines": {
-    "node": "24.x"
+    "node": "20.x"
   }
 }
