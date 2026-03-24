@@ -1,14 +1,14 @@
 {
   "version": 2,
   "framework": "vite",
-  "buildCommand": "npm run build",
+  "buildCommand": "cd frontend && npm run build",
   "outputDirectory": "frontend/dist",
-  "installCommand": "cd frontend && npm install",
+  "installCommand": "cd frontend && npm install && pip install -r backend/requirements.txt",
   "devCommand": "cd frontend && npm run dev",
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://chessai-production-4b3a.up.railway.app/api/$1"
+      "destination": "/api/index.py"
     },
     {
       "source": "/(.*)",
@@ -33,5 +33,12 @@
         }
       ]
     }
-  ]
+  ],
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 60,
+      "memory": 3008,
+      "includeFiles": "backend/**"
+    }
+  }
 }

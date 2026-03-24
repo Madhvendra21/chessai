@@ -1,45 +1,36 @@
-"""Vercel Serverless API Handler"""
-from http.server import BaseHTTPRequestHandler
-import json
+"""
+Vercel Serverless Function Entry Point
+Routes API requests to the appropriate backend handlers
+"""
+import sys
 import os
 
-class handler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.end_headers()
-        
-        response = {
-            "message": "ChessVision AI API",
-            "version": "1.0.0",
-            "status": "online",
-            "endpoints": [
-                "/api/health",
-                "/api/jobs",
-                "/api/jobs/{id}",
-                "/api/games/{id}"
-            ]
-        }
-        
-        self.wfile.write(json.dumps(response).encode())
+# Add backend to path
+backend_path = os.path.join(os.path.dirname(__file__), '..', 'backend')
+if backend_path not in sys.path:
+    sys.path.insert(0, backend_path)
+
+# Import and run the FastAPI app
+from backend.api.index import app
+
+# Vercel expects a handler function
+from fastapi import Request
+from fastapi.responses import JSONResponse
+import json
+
+async def handler(request: Request):
+    """Handle incoming requests"""
+    # Route to FastAPI app
+    from mangum import Mangum
     
-    def do_POST(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.end_headers()
-        
-        response = {
-            "status": "received",
-            "message": "API endpoint ready"
-        }
-        
-        self.wfile.write(json.dumps(response).encode())
+    # Create Mangum handler
+    handler = Mangum(app, lifespan="off")
     
-    def do_OPTIONS(self):
-        self.send_response(200)
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-        self.end_headers()
+    # Process the request
+    response = await handler(request.scope, request.receive, request.send)
+    return response
+
+# For Vercel, we need to export the app directly
+# Vercel will use the app object
+from mangum import Mangum
+lambda_handler = Mangum(app, lifespan="off")
