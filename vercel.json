@@ -5,10 +5,7 @@
     "enabled": true
   },
   "framework": null,
-  "buildCommand": null,
-  "devCommand": null,
-  "installCommand": null,
-  "outputDirectory": ".",
+  "outputDirectory": "dist",
   "builds": [
     {
       "src": "api/index.py",
