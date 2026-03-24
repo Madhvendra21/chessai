@@ -2,25 +2,18 @@
   "version": 2,
   "builds": [
     {
-      "src": "backend/api/main.py",
-      "use": "@vercel/python"
-    },
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "src": "public/**/*",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "backend/api/main.py"
+      "dest": "https://chessvision-api.vercel.app/api/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "frontend/dist/$1"
+      "dest": "/public/$1"
     }
   ]
 }
