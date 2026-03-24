@@ -1,25 +1,45 @@
-# Backend - deployed separately on Railway
-backend/
-api/
+# Vercel Ignore Rules
+# These files/folders are excluded from the build
 
-# CV Pipeline - not needed for frontend
-cv-pipeline/
+# Development files
+.env
+.env.local
+.env.*.local
+.git
+.github
+.gitignore
 
-# Workers - not needed for frontend
-workers/
+# Documentation
+docs/
+*.md
+!DEPLOY_NOW.md
 
-# Docker files
+# Docker files (not needed for Vercel)
 docker/
 
-# Data and models
+# Scripts (not needed for runtime)
+scripts/
+
+# Data files (large, not needed for build)
 data/
-*.pt
 *.pth
 *.onnx
-*.h5
-*.pkl
+*.weights
+models/
 
-# Python
+# Testing
+tests/
+test/
+.pytest_cache/
+
+# Local development
+.DS_Store
+.idea/
+.vscode/
+*.log
+local_settings.py
+
+# Python cache
 __pycache__/
 *.py[cod]
 *$py.class
@@ -27,31 +47,18 @@ __pycache__/
 .Python
 env/
 venv/
-.env
-.env.local
+ENV/
 
-# Node (if any at root)
-node_modules/
+# Build outputs
+dist/
+build/
+*.egg-info/
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
+# Frontend source (already built or served separately)
+# frontend/src/  # Commented out - might be needed
 
-# OS
-.DS_Store
-Thumbs.db
+# Allow api/ folder for Vercel functions - DO NOT EXCLUDE
+# api/
 
-# Git
-.git/
-.gitignore
-
-# Scripts
-scripts/
-
-# Docs (optional - keep README)
-docs/
-
-# Logs
-*.log
+# Allow backend/ for potential imports if needed
+# backend/
