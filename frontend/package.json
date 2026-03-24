@@ -1,0 +1,71 @@
+{
+  "name": "chessvision-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.21.0",
+    "react-chessboard": "^4.3.4",
+    "chess.js": "^1.0.0-beta.7",
+    "axios": "^1.6.2",
+    "recharts": "^2.10.3",
+    "react-player": "^2.14.0",
+    "styled-components": "^6.1.1",
+    "react-dropzone": "^14.2.3",
+    "react-hot-toast": "^2.4.1",
+    "date-fns": "^3.0.6",
+    "lucide-react": "^0.294.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "eslintConfig": {
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:react-hooks/recommended"
+    ],
+    "ignorePatterns": [
+      "dist",
+      ".eslintrc.cjs"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "react-refresh"
+    ],
+    "rules": {
+      "react-refresh/only-export-components": [
+        "warn",
+        {
+          "allowConstantExport": true
+        }
+      ]
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
