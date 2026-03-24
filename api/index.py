@@ -63,11 +63,5 @@ def get_job(job_id: str):
 def list_jobs():
     return list(jobs.values())
 
-# Vercel serverless handler
-mangum_handler = Mangum(app, lifespan="off")
-
-def handler(request, context=None):
-    """
-    Vercel serverless function handler
-    """
-    return mangum_handler(request, context)
+# Vercel serverless handler - must be named 'handler' and be the Mangum instance directly
+handler = Mangum(app, lifespan="off")
