@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChessVision AI - Chess Video Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            padding: 4rem 0;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #7ee8fa 0%, #4d96ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .upload-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 3rem;
+            margin: 3rem 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            border-color: #7ee8fa;
+            color: #fff;
+        }
+        
+        .tab.active {
+            background: rgba(126, 232, 250, 0.2);
+            border-color: #7ee8fa;
+            color: #7ee8fa;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        
+        input[type="text"]:focus {
+            border-color: #7ee8fa;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #7ee8fa 0%, #4d96ff 100%);
+            border: none;
+            border-radius: 8px;
+            color: #1a1a2e;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(126, 232, 250, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(126, 232, 250, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .feature-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+        
+        .feature-desc {
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.5;
+        }
+        
+        #status {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            display: none;
+        }
+        
+        #status.show {
+            display: block;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7ee8fa, #4d96ff);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 3rem 0;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 4rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .upload-section {
+                padding: 2rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ChessVision AI</h1>
+            <p class="subtitle">
+                Transform chess videos into interactive game analysis. 
+                Upload any chess video or YouTube link, and our AI will extract moves, 
+                analyze positions, and provide insights.
+            </p>
+        </header>
+        
+        <div class="upload-section">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('url')">YouTube URL</button>
+                <button class="tab" onclick="switchTab('upload')">Upload Video</button>
+            </div>
+            
+            <div id="url-tab">
+                <div class="input-group">
+                    <input type="text" id="videoUrl" placeholder="Paste YouTube URL here...">
+                    <button class="btn" onclick="processVideo()">Analyze Video</button>
+                </div>
+            </div>
+            
+            <div id="upload-tab" style="display: none;">
+                <div class="input-group">
+                    <input type="file" id="videoFile" accept="video/*" style="display: none;">
+                    <button class="btn" onclick="document.getElementById('videoFile').click()">Select Video File</button>
+                    <span id="filename" style="color: rgba(255,255,255,0.5); padding: 1rem;"></span>
+                </div>
+                <button class="btn" id="uploadBtn" onclick="uploadVideo()" disabled>Upload & Analyze</button>
+            </div>
+            
+            <div id="status">
+                <p id="statusText">Processing...</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">📹</div>
+                <h3 class="feature-title">Video Processing</h3>
+                <p class="feature-desc">Supports YouTube URLs and video uploads. Automatically extracts frames and detects board positions using computer vision.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3 class="feature-title">AI Analysis</h3>
+                <p class="feature-desc">Powered by YOLO object detection and Stockfish chess engine. Get move-by-move evaluations and identify blunders.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Interactive Viewer</h3>
+                <p class="feature-desc">Browse through moves with synchronized board state. View evaluation graphs and get detailed insights.</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>ChessVision AI © 2024 | Built with OpenCV, YOLO, Stockfish & React</p>
+        </footer>
+    </div>
+    
+    <script>
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:8000/api' 
+            : '/api';
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('url-tab').style.display = tab === 'url' ? 'block' : 'none';
+            document.getElementById('upload-tab').style.display = tab === 'upload' ? 'block' : 'none';
+        }
+        
+        document.getElementById('videoFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('filename').textContent = file.name;
+                document.getElementById('uploadBtn').disabled = false;
+            }
+        });
+        
+        async function processVideo() {
+            const url = document.getElementById('videoUrl').value.trim();
+            if (!url) {
+                alert('Please enter a YouTube URL');
+                return;
+            }
+            
+            showStatus('Starting analysis...', 10);
+            
+            try {
+                const response = await fetch(`${API_URL}/jobs/from-url`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url, title: 'YouTube Video' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showStatus('Video queued for processing. Job ID: ' + data.id, 100);
+                    setTimeout(() => {
+                        window.location.href = `/jobs.html?job=${data.id}`;
+                    }, 2000);
+                } else {
+                    showStatus('Error starting analysis. Please try again.', 0);
+                }
+            } catch (error) {
+                console.error(error);
+                showStatus('Network error. Please check your connection.', 0);
+            }
+        }
+        
+        async function uploadVideo() {
+            const file = document.getElementById('videoFile').files[0];
+            if (!file) return;
+            
+            showStatus('Uploading video...', 30);
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('title', file.name);
+            
+            try {
+                const response = await fetch(`${API_URL}/jobs/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showStatus('Video uploaded. Processing...', 100);
+                    setTimeout(() => {
+                        window.location.href = `/jobs.html?job=${data.id}`;
+                    }, 2000);
+                } else {
+                    showStatus('Upload failed. Please try again.', 0);
+                }
+            } catch (error) {
+                console.error(error);
+                showStatus('Upload error. Please check your connection.', 0);
+            }
+        }
+        
+        function showStatus(text, progress) {
+            document.getElementById('status').classList.add('show');
+            document.getElementById('statusText').textContent = text;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+    </script>
+</body>
+</html>

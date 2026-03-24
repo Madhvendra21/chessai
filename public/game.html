@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Analysis - ChessVision AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            padding: 2rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .back-link {
+            color: #7ee8fa;
+            text-decoration: none;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            color: #fff;
+        }
+        
+        .game-container {
+            display: grid;
+            grid-template-columns: 1fr 350px 350px;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 1200px) {
+            .game-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .board-section {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        
+        #chessboard {
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 1;
+            background: #769656;
+            border-radius: 8px;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        
+        .square {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .square.light {
+            background: #eeeed2;
+        }
+        
+        .square.dark {
+            background: #769656;
+        }
+        
+        .square.selected {
+            background: rgba(255, 255, 0, 0.5) !important;
+        }
+        
+        .square.last-move {
+            background: rgba(155, 199, 0, 0.5) !important;
+        }
+        
+        .panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .panel h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #7ee8fa;
+        }
+        
+        .move-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .move-row {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.4rem;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .move-row:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .move-row.current {
+            background: rgba(126, 232, 250, 0.2);
+        }
+        
+        .move-number {
+            color: rgba(255, 255, 255, 0.5);
+            width: 30px;
+        }
+        
+        .move-text {
+            flex: 1;
+        }
+        
+        .move-text.blunder {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        
+        .move-text.mistake {
+            color: #ffd93d;
+        }
+        
+        .insights {
+            margin-top: 1rem;
+        }
+        
+        .insight-item {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border-left: 3px solid #7ee8fa;
+        }
+        
+        .insight-type {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+        
+        .control-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .control-btn:hover {
+            background: rgba(126, 232, 250, 0.2);
+        }
+        
+        .evaluation {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .eval-score {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #7ee8fa;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #7ee8fa;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/jobs.html" class="back-link">← Back to Jobs</a>
+            <h1>Game Analysis</h1>
+        </header>
+        
+        <div id="loading" style="text-align: center; padding: 4rem;">
+            <div class="spinner"></div>
+            <p style="color: rgba(255,255,255,0.5);">Loading game...</p>
+        </div>
+        
+        <div id="gameContent" class="game-container" style="display: none;">
+            <div class="board-section">
+                <div>
+                    <div class="evaluation">
+                        <div class="eval-score" id="evaluation">+0.0</div>
+                        <div style="color: rgba(255,255,255,0.5); font-size: 0.9rem;">Evaluation</div>
+                    </div>
+                    <div id="chessboard"></div>
+                    <div class="controls">
+                        <button class="control-btn" onclick="firstMove()">⏮</button>
+                        <button class="control-btn" onclick="prevMove()">◀</button>
+                        <button class="control-btn" onclick="nextMove()">▶</button>
+                        <button class="control-btn" onclick="lastMove()">⏭</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h2>Moves</h2>
+                <div class="move-list" id="moveList"></div>
+            </div>
+            
+            <div class="panel">
+                <h2>Insights</h2>
+                <div class="insights" id="insights">
+                    <p style="color: rgba(255,255,255,0.5);">No insights available</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:8000/api' 
+            : '/api';
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const gameId = urlParams.get('id');
+        
+        let game = null;
+        let currentMove = 0;
+        let board = [];
+        
+        // Unicode chess pieces
+        const pieces = {
+            'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
+            'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
+        };
+        
+        function initBoard() {
+            const boardEl = document.getElementById('chessboard');
+            boardEl.innerHTML = '';
+            
+            for (let rank = 0; rank < 8; rank++) {
+                for (let file = 0; file < 8; file++) {
+                    const square = document.createElement('div');
+                    square.className = `square ${(rank + file) % 2 === 0 ? 'light' : 'dark'}`;
+                    square.dataset.rank = 7 - rank;
+                    square.dataset.file = file;
+                    boardEl.appendChild(square);
+                }
+            }
+        }
+        
+        function parseFEN(fen) {
+            const rows = fen.split(' ')[0].split('/');
+            const board = [];
+            
+            for (const row of rows) {
+                const boardRow = [];
+                for (const char of row) {
+                    if (/\d/.test(char)) {
+                        for (let i = 0; i < parseInt(char); i++) {
+                            boardRow.push('');
+                        }
+                    } else {
+                        boardRow.push(char);
+                    }
+                }
+                board.push(boardRow);
+            }
+            
+            return board;
+        }
+        
+        function updateBoard() {
+            const squares = document.querySelectorAll('.square');
+            
+            for (let rank = 0; rank < 8; rank++) {
+                for (let file = 0; file < 8; file++) {
+                    const square = squares[rank * 8 + file];
+                    const piece = board[rank][file];
+                    square.textContent = piece ? pieces[piece] : '';
+                }
+            }
+        }
+        
+        function renderMoves() {
+            const moveList = document.getElementById('moveList');
+            if (!game || !game.moves) return;
+            
+            let html = '';
+            for (let i = 0; i < game.moves.length; i += 2) {
+                const moveNum = Math.floor(i / 2) + 1;
+                const white = game.moves[i];
+                const black = game.moves[i + 1];
+                
+                html += `<div class="move-row ${currentMove === i || currentMove === i + 1 ? 'current' : ''}">`;
+                html += `<span class="move-number">${moveNum}.</span>`;
+                
+                if (white) {
+                    const className = white.is_blunder ? 'blunder' : white.is_mistake ? 'mistake' : '';
+                    html += `<span class="move-text ${className}" onclick="goToMove(${i})">${white.san}</span>`;
+                }
+                
+                if (black) {
+                    const className = black.is_blunder ? 'blunder' : black.is_mistake ? 'mistake' : '';
+                    html += `<span class="move-text ${className}" onclick="goToMove(${i + 1})">${black.san}</span>`;
+                }
+                
+                html += '</div>';
+            }
+            
+            moveList.innerHTML = html;
+        }
+        
+        function goToMove(index) {
+            currentMove = index;
+            
+            if (index === 0) {
+                board = parseFEN('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
+            } else if (game && game.moves[index - 1]) {
+                board = parseFEN(game.moves[index - 1].fen);
+            }
+            
+            updateBoard();
+            renderMoves();
+            updateEvaluation();
+        }
+        
+        function firstMove() {
+            goToMove(0);
+        }
+        
+        function prevMove() {
+            if (currentMove > 0) {
+                goToMove(currentMove - 1);
+            }
+        }
+        
+        function nextMove() {
+            if (game && currentMove < game.moves.length) {
+                goToMove(currentMove + 1);
+            }
+        }
+        
+        function lastMove() {
+            if (game) {
+                goToMove(game.moves.length);
+            }
+        }
+        
+        function updateEvaluation() {
+            const evalEl = document.getElementById('evaluation');
+            if (game && game.moves[currentMove - 1]) {
+                const eval_ = game.moves[currentMove - 1].evaluation;
+                if (eval_ !== undefined) {
+                    const sign = eval_ > 0 ? '+' : '';
+                    evalEl.textContent = `${sign}${eval_.toFixed(1)}`;
+                    return;
+                }
+            }
+            evalEl.textContent = '+0.0';
+        }
+        
+        async function loadGame() {
+            if (!gameId) {
+                document.getElementById('loading').innerHTML = '<p style="color: rgba(255,255,255,0.5);">No game ID provided</p>';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/games/${gameId}`);
+                
+                if (response.ok) {
+                    game = await response.json();
+                    
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('gameContent').style.display = 'grid';
+                    
+                    initBoard();
+                    board = parseFEN('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
+                    updateBoard();
+                    renderMoves();
+                    
+                    if (game.moves && game.moves.length > 0) {
+                        lastMove();
+                    }
+                } else {
+                    document.getElementById('loading').innerHTML = '<p style="color: rgba(255,255,255,0.5);">Game not found</p>';
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('loading').innerHTML = '<p style="color: rgba(255,255,255,0.5);">Error loading game</p>';
+            }
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') prevMove();
+            if (e.key === 'ArrowRight') nextMove();
+        });
+        
+        loadGame();
+    </script>
+</body>
+</html>
