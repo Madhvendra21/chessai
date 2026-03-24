@@ -1,7 +1,13 @@
 {
-  "name": "chessvision-static",
+  "name": "chessvision-ai",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
-    "build": "mkdir -p dist && cp *.html dist/ 2>/dev/null || true"
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "preview": "cd frontend && npm run preview"
+  },
+  "engines": {
+    "node": "24.x"
   }
 }

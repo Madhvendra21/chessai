@@ -1,8 +1,57 @@
-frontend/
+# Backend - deployed separately on Railway
 backend/
+api/
+
+# CV Pipeline - not needed for frontend
 cv-pipeline/
+
+# Workers - not needed for frontend
 workers/
-scripts/
+
+# Docker files
 docker/
+
+# Data and models
 data/
+*.pt
+*.pth
+*.onnx
+*.h5
+*.pkl
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+.env.local
+
+# Node (if any at root)
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Scripts
+scripts/
+
+# Docs (optional - keep README)
 docs/
+
+# Logs
+*.log
